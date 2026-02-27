@@ -3,7 +3,7 @@ package eu.endermite.censura.listener;
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.PlayerChatHistory;
 import eu.endermite.censura.filter.Filter;
-import org.apache.commons.text.similarity.JaroWinklerDistance;
+import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class SimilarMessageListener implements Listener {
-    private final JaroWinklerDistance similiarity = new JaroWinklerDistance();
+    private final JaroWinklerSimilarity similiarity = new JaroWinklerSimilarity();
     private final HashMap<UUID, PlayerChatHistory> chatHistory = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -31,7 +31,9 @@ public class SimilarMessageListener implements Listener {
         }
 
         for (String message : messages.getMessageHistory()) {
-            if (similiarity.apply(message, currentMessage) * 100 > Censura.getCachedConfig().getSimilarMessageThreshold()) {
+            int percent = (int) (similiarity.apply(message, currentMessage) * 100);
+
+            if (percent > Censura.getCachedConfig().getSimilarMessageThreshold()) {
                 event.setCancelled(true);
                 Filter.doActions(Censura.getCachedConfig().getSimilarCheckActions(), event.getPlayer());
                 return;

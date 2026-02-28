@@ -1,0 +1,26 @@
+package eu.endermite.censura.notification;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+public class NotificationListener implements Listener {
+    private final StaffNotification staffNotification;
+
+    public NotificationListener(StaffNotification staffNotification) {
+        this.staffNotification = staffNotification;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().hasPermission("censura.notify")) {
+            staffNotification.addStaff(event.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        staffNotification.removeStaff(event.getPlayer());
+    }
+}

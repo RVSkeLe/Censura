@@ -15,7 +15,10 @@ public class ConfigUpdater {
     }
 
     public void update() {
-        boolean changed = migrateSimilarity(plugin.getConfig());
+        FileConfiguration config = plugin.getConfig();
+
+        boolean changed = migrateSimilarity(config);
+        changed |= migrateNotificationSettings(config);
 
         if (changed) {
             plugin.saveConfig();
@@ -37,6 +40,32 @@ public class ConfigUpdater {
             config.setComments("similarity.max-similar-messages", addComments(comment2));
 
             config.set("similarity.message-amount", null);
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private boolean migrateNotificationSettings(FileConfiguration config) {
+        boolean changed = false;
+
+        if (!config.isSet("notify-detections")) {
+            config.set("notify-detections", true);
+
+            config.setComments(
+                    "notify-detections",
+                    addComments("Should detections that contain filtered words be sent to players")
+            );
+            changed = true;
+        }
+
+        if (!config.isSet("messages.notification-enabled")) {
+            config.set("messages.notification-enabled", "Censura - &aNotification enabled.");
+            changed = true;
+        }
+
+        if (!config.isSet("messages.notification-disabled")) {
+            config.set("messages.notification-disabled", "Censura - &cNotification disabled.");
             changed = true;
         }
 

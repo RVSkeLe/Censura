@@ -4,6 +4,7 @@ import eu.endermite.censura.Censura;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.ArrayList;
@@ -21,11 +22,10 @@ public class CensuraCommand implements TabExecutor {
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
-            if (sender.hasPermission("censura.reload")) {
-                Censura.getPlugin().asyncReloadConfigCache(sender);
-            } else {
-                sender.sendMessage(Censura.getCachedConfig().getNoPermission());
-            }
+            handleReload(sender);
+        }
+        else if (args[0].equalsIgnoreCase("toggle")) {
+            handleToggle(sender);
         } else {
             sender.sendMessage(Censura.getCachedConfig().getNoSuchCommand());
         }
@@ -38,6 +38,7 @@ public class CensuraCommand implements TabExecutor {
         List<String> result = new ArrayList<>();
 
         allSubCommands.put("reload", "censura.reload");
+        allSubCommands.put("toggle", "censura.toggle");
 
         if (args.length == 1) {
             for (Map.Entry<String,String> sub : allSubCommands.entrySet()) {
@@ -54,5 +55,35 @@ public class CensuraCommand implements TabExecutor {
         assert desc.getDescription() != null;
         sender.sendMessage(desc.getDescription());
     }
-}
 
+    private void handleReload(CommandSender sender) {
+        if (sender.hasPermission("censura.reload")) {
+            Censura.getPlugin().asyncReloadConfigCache(sender);
+        } else {
+            sender.sendMessage(Censura.getCachedConfig().getNoPermission());
+        }
+    }
+
+    private void handleToggle(CommandSender sender) {
+        if (!(sender instanceof Player)) return;
+        Player player = (Player) sender;
+
+        if (!player.hasPermission("censura.toggle")) {
+            player.sendMessage(Censura.getCachedConfig().getNoPermission());
+            return;
+        }
+
+        if (!player.hasPermission("censura.notify")) {
+            player.sendMessage(Censura.getCachedConfig().getNoPermission());
+            return;
+        }
+
+        if (Censura.getStaffNotification().contains(player)) {
+            Censura.getStaffNotification().removeStaff(player);
+            player.sendMessage(Censura.getCachedConfig().getNotificationDisabled());
+        } else {
+            Censura.getStaffNotification().addStaff(player);
+            player.sendMessage(Censura.getCachedConfig().getNotificationEnabled());
+        }
+    }
+}

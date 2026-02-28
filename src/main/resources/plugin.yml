@@ -14,3 +14,9 @@ permissions:
   censura.bypass:
     default: false
     description: Allows to bypass filters of Censura
+  censura.notify:
+    default: op
+    description: Allows to receive notifications about canceled actions
+  censura.toggle:
+    default: op
+    description: Allows to toggle notifications

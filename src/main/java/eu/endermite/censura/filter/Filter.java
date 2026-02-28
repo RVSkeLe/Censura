@@ -2,6 +2,7 @@ package eu.endermite.censura.filter;
 
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.config.CachedConfig;
+import eu.endermite.censura.notification.CheckType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,22 +33,50 @@ public class Filter {
         return message;
     }
 
-    public static boolean detect(String message, CachedConfig.FilterCategory filter) {
-        message = preprocessString(message);
+    public static boolean detect(String message, CachedConfig.FilterCategory filter, String suspectName, CheckType checkType) {
+        MatchType match = detectMatch(message, filter);
+        if (match == null) {
+            return false;
+        }
+        CachedConfig cachedConfig = Censura.getCachedConfig();
+
+        String notificationMessage = null;
+        if (cachedConfig.isLogDetections() || cachedConfig.isNotifyDetections())
+            notificationMessage = createMessageToLog(match, message, suspectName, checkType);
+
+        if (cachedConfig.isLogDetections())
+            Censura.getPlugin().getLogger().info(ChatColor.stripColor(notificationMessage));
+
+        if (cachedConfig.isNotifyDetections())
+            Censura.getStaffNotification().sendNotification(notificationMessage);
+
+        return true;
+    }
+
+    private static MatchType detectMatch(String message, CachedConfig.FilterCategory filter) {
+        String processed = preprocessString(message);
         List<MatchType> matches = filter.getMatches();
 
         FilterCache cache = new FilterCache();
         for (MatchType match : matches) {
-            if (match.match(message, cache)) {
-                if (Censura.getCachedConfig().isLogDetections())
-                    Censura.getPlugin().getLogger().info(String.format("Detected \"%s\" in phrase \"%s\" (type: %s)", match.getSnippet(), message, match.getType()));
-                return true;
+            if (match.match(processed, cache)) {
+                return match;
             }
         }
-        return false;
+
+        return null;
     }
 
-    public static boolean filter(String message, Player player) {
+    public static String createMessageToLog(MatchType match, String message, String suspectName, CheckType checkType) {
+        return String.format("§c%s §7wrote §4\"%s\" §7containing: §4\"%s\" §7in: §c%s",
+                suspectName,
+                message,
+                match.getSnippet(),
+                checkType.toString()
+        );
+    }
+
+    public static boolean filter(String message, Player player, CheckType checkType) {
         if (player.isOp() && Censura.getCachedConfig().getOpBypass())
             return false;
 
@@ -55,7 +84,7 @@ public class Filter {
             return false;
 
         for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
-            if (detect(message, filter)) {
+            if (detect(message, filter, player.getName(), checkType)) {
                 doActions(filter.getPunishments(), player);
                 return true;
             }
@@ -63,10 +92,10 @@ public class Filter {
         return false;
     }
 
-    public static boolean filterNoActions(String message) {
+    public static boolean filterNoActions(String message, String suspectName, CheckType checkType) {
 
         for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
-            if (detect(message, filter))
+            if (detect(message, filter, suspectName, checkType))
                 return true;
         }
         return false;

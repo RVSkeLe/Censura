@@ -3,6 +3,7 @@ package eu.endermite.censura.config;
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.MatchType;
 import eu.endermite.censura.listener.*;
+import eu.endermite.censura.notification.NotificationListener;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,8 +23,9 @@ public class CachedConfig {
     List<String> commandsToFilter = new ArrayList<>();
     List<String> similarCheckActions = new ArrayList<>();
 
-    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
-    boolean opBypass, kickOnJoin, logDetections;
+    String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed,
+        notificationEnabled, notificationDisabled;
+    boolean opBypass, kickOnJoin, logDetections, notifyDetections;
 
     Integer similarMessagesToCheck, similarMaxMessages, similarMessageThreshold;
 
@@ -72,6 +74,12 @@ public class CachedConfig {
         if (similarity != null && similarity.getBoolean("enabled", false)) {
             similarMessagesToCheck = similarity.getInt("messages-to-check", 3);
             similarMaxMessages = similarity.getInt("max-similar-messages", 1);
+
+            if (similarMaxMessages > similarMessagesToCheck) {
+                plugin.getLogger().warning("max-similar-messages cannot be greater than messages-to-check. Adjusting automatically.");
+                similarMaxMessages = similarMessagesToCheck;
+            }
+
             similarMessageThreshold = similarity.getInt("threshold", 80);
             similarCheckActions = similarity.getStringList("actions");
         }
@@ -140,6 +148,7 @@ public class CachedConfig {
         opBypass = config.getBoolean("op-bypass", true);
         kickOnJoin = config.getBoolean("kick-on-bad-name", true);
         logDetections = config.getBoolean("log-detections", true);
+        notifyDetections = config.getBoolean("notify-detections", true);
 
         ConfigurationSection messages = config.getConfigurationSection("messages");
         if (messages == null) {
@@ -151,6 +160,8 @@ public class CachedConfig {
         noSuchCommand = messages.getString("no-such-command", "Censura - &cThere is no such command.");
         configReloaded = messages.getString("config-reloaded", "Censura - &aConfiguration reloaded.");
         kickBadName = messages.getString("kick-bad-name", "Censura\n&cYour name contains bad words!");
+        notificationEnabled = messages.getString("notification-enabled", "Censura - &aNotification enabled.");
+        notificationDisabled = messages.getString("notification-disabled", "Censura - &cNotification disabled.");
     }
 
     public List<FilterCategory> getCategories() {
@@ -181,6 +192,14 @@ public class CachedConfig {
         return ChatColor.translateAlternateColorCodes('&', kickBadName);
     }
 
+    public String getNotificationEnabled() {
+        return ChatColor.translateAlternateColorCodes('&', notificationEnabled);
+    }
+
+    public String getNotificationDisabled() {
+        return ChatColor.translateAlternateColorCodes('&', notificationDisabled);
+    }
+
     public boolean getOpBypass() {
         return opBypass;
     }
@@ -191,6 +210,10 @@ public class CachedConfig {
 
     public boolean isLogDetections() {
         return logDetections;
+    }
+
+    public boolean isNotifyDetections() {
+        return notifyDetections;
     }
 
     public String getPrefilterRegex() {

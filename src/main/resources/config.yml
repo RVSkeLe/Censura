@@ -16,6 +16,9 @@ checks:
 # Should detections that contain filtered words be logged in console
 log-detections: true
 
+# Should detections that contain filtered words be sent to players
+notify-detections: true
+
 # Commands of which arguments should be checked.
 # It's recommended to list all private message commands and their aliases
 # and every command that allows changing item name etc.
@@ -116,3 +119,5 @@ messages:
   no-such-command: "Censura - &cThere is no such command."
   config-reloaded: "Censura - &aConfiguration reloaded."
   kick-bad-name: "Censura\n&cYour name contains bad words!"
+  notification-enabled: "Censura - &aNotification enabled."
+  notification-disabled: "Censura - &cNotification disabled."

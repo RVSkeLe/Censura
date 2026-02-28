@@ -2,6 +2,7 @@ package eu.endermite.censura;
 
 import eu.endermite.censura.command.CensuraCommand;
 import eu.endermite.censura.config.CachedConfig;
+import eu.endermite.censura.config.ConfigUpdater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +15,7 @@ public final class Censura extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        new ConfigUpdater(this).update();
         reloadConfigCache();
 
         try {

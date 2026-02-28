@@ -24,7 +24,8 @@ public class CachedConfig {
 
     String noPermission, noSuchCommand, configReloaded, kickBadName, prefilterRegex, prefilterFailed;
     boolean opBypass, kickOnJoin, logDetections;
-    Integer similarMessageAmount, similarMessageThreshold;
+
+    Integer similarMessagesToCheck, similarMaxMessages, similarMessageThreshold;
 
     public CachedConfig() {
         Censura plugin = Censura.getPlugin();
@@ -32,6 +33,10 @@ public class CachedConfig {
 
         // Unregister all listeners created by Censura
         HandlerList.unregisterAll(plugin);
+
+        // Register flood first so that it filters potential staff notification flooding
+        if (config.getBoolean("similarity.enabled", false))
+            registerListener(SimilarMessageListener.class);
 
         if (config.getBoolean("checks.chat", true))
             registerListener(ChatEventListener.class);
@@ -51,10 +56,6 @@ public class CachedConfig {
         if (config.getBoolean("checks.nametag-use", true))
             registerListener(EntityRenameListener.class);
 
-        if (config.getBoolean("similarity.enabled", false)) {
-            registerListener(SimilarMessageListener.class);
-        }
-
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
             config.createSection("filter");
@@ -69,7 +70,8 @@ public class CachedConfig {
 
         ConfigurationSection similarity = config.getConfigurationSection("similarity");
         if (similarity != null && similarity.getBoolean("enabled", false)) {
-            similarMessageAmount = similarity.getInt("message-amount", 3);
+            similarMessagesToCheck = similarity.getInt("messages-to-check", 3);
+            similarMaxMessages = similarity.getInt("max-similar-messages", 1);
             similarMessageThreshold = similarity.getInt("threshold", 80);
             similarCheckActions = similarity.getStringList("actions");
         }
@@ -199,8 +201,12 @@ public class CachedConfig {
         return ChatColor.translateAlternateColorCodes('&', prefilterFailed);
     }
 
-    public Integer getSimilarMessageAmount() {
-        return similarMessageAmount;
+    public Integer getSimilarMessagesToCheck() {
+        return similarMessagesToCheck;
+    }
+
+    public Integer getSimilarMaxMessages() {
+        return similarMaxMessages;
     }
 
     public Integer getSimilarMessageThreshold() {

@@ -3,7 +3,6 @@ package eu.endermite.censura.config;
 import eu.endermite.censura.Censura;
 import eu.endermite.censura.filter.MatchType;
 import eu.endermite.censura.listener.*;
-import eu.endermite.censura.notification.NotificationListener;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -36,6 +35,8 @@ public class CachedConfig {
         // Unregister all listeners created by Censura
         HandlerList.unregisterAll(plugin);
 
+        kickOnJoin = config.getBoolean("kick-on-bad-name", true);
+
         // Register flood first so that it filters potential staff notification flooding
         if (config.getBoolean("similarity.enabled", false))
             registerListener(SimilarMessageListener.class);
@@ -57,6 +58,9 @@ public class CachedConfig {
 
         if (config.getBoolean("checks.nametag-use", true))
             registerListener(EntityRenameListener.class);
+
+        if (kickOnJoin)
+            registerListener(PlayerJoinListener.class);
 
         ConfigurationSection filter = config.getConfigurationSection("filter");
         if (filter == null) {
@@ -146,7 +150,6 @@ public class CachedConfig {
 
         commandsToFilter.addAll(config.getStringList("filtered-commands"));
         opBypass = config.getBoolean("op-bypass", true);
-        kickOnJoin = config.getBoolean("kick-on-bad-name", true);
         logDetections = config.getBoolean("log-detections", true);
         notifyDetections = config.getBoolean("notify-detections", true);
 

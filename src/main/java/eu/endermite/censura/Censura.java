@@ -20,6 +20,7 @@ public final class Censura extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        saveDefaultConfig();
         new ConfigUpdater(this).update();
         reloadConfigCache();
 

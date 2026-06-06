@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class SimilarMessageListener implements Listener {
-    private final JaroWinklerDistance similiarity = new JaroWinklerDistance();
+    private final JaroWinklerDistance similarity = new JaroWinklerDistance();
     private final HashMap<UUID, PlayerChatHistory> chatHistory = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -30,11 +30,13 @@ public class SimilarMessageListener implements Listener {
             return;
         }
 
-        for (String message : messages.getMessageHistory()) {
-            if (similiarity.apply(message, currentMessage) * 100 > Censura.getCachedConfig().getSimilarMessageThreshold()) {
-                event.setCancelled(true);
-                Filter.doActions(Censura.getCachedConfig().getSimilarCheckActions(), event.getPlayer());
-                return;
+        if (!Filter.isExempt(event.getPlayer())) {
+            for (String message : messages.getMessageHistory()) {
+                if (similarity.apply(message, currentMessage) * 100 > Censura.getCachedConfig().getSimilarMessageThreshold()) {
+                    event.setCancelled(true);
+                    Filter.doActions(Censura.getCachedConfig().getSimilarCheckActions(), event.getPlayer());
+                    return;
+                }
             }
         }
         messages.addMessage(currentMessage);

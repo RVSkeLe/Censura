@@ -1,7 +1,7 @@
 name: Censura
 version: ${project.version}
 main: eu.endermite.censura.Censura
-api-version: 1.13
+api-version: 1.17
 authors: [ YouHaveTrouble ]
 description: Censor everything you want
 commands:

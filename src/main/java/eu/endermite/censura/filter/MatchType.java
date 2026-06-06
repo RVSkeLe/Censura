@@ -1,6 +1,5 @@
 package eu.endermite.censura.filter;
 
-import javax.annotation.Nullable;
 
 public interface MatchType {
     boolean match(String message, FilterCache cache);
@@ -12,8 +11,7 @@ public interface MatchType {
 
     String getType();
 
-    @Nullable
-    static MatchType fromString(@Nullable String type, String input) {
+    static MatchType fromString(String type, String input) {
         if (type == null) return new FullwordMatch(input);
         switch (type) {
             case "contain":

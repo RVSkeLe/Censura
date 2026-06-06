@@ -5,11 +5,12 @@ import eu.endermite.censura.filter.Filter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public class CommandListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onInteractEvent(org.bukkit.event.player.PlayerCommandPreprocessEvent event) {
+    public void onInteractEvent(PlayerCommandPreprocessEvent event) {
         String msg = event.getMessage().toLowerCase();
         for (String cmd : Censura.getCachedConfig().getCommandsToFilter()) {
             if (msg.startsWith("/" + cmd + " ")) {

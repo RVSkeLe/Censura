@@ -2,14 +2,10 @@ package eu.endermite.censura;
 
 import eu.endermite.censura.command.CensuraCommand;
 import eu.endermite.censura.config.CachedConfig;
-import eu.endermite.censura.config.ConfigUpdater;
 import eu.endermite.censura.notification.StaffNotification;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.reflect.InvocationTargetException;
 
 public final class Censura extends JavaPlugin {
 
@@ -20,8 +16,6 @@ public final class Censura extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        saveDefaultConfig();
-        new ConfigUpdater(this).update();
         reloadConfigCache();
 
         staffNotification = new StaffNotification(this);

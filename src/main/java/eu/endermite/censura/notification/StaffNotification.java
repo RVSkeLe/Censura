@@ -12,7 +12,7 @@ public class StaffNotification {
 
     public StaffNotification(Censura plugin) {
         staffNotify = ConcurrentHashMap.newKeySet();
-        findStaff();
+        refreshStaffCache();
 
         plugin.getServer().getPluginManager().registerEvents(new NotificationListener(this), plugin);
     }
@@ -29,11 +29,11 @@ public class StaffNotification {
         staffNotify.clear();
     }
 
-    public boolean contains(Player player) {
+    public boolean isStaffNotified(Player player) {
         return staffNotify.contains(player);
     }
 
-    public void findStaff() {
+    public void refreshStaffCache() {
         staffNotify.clear();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -44,7 +44,7 @@ public class StaffNotification {
     }
 
     public void sendNotification(String message) {
-        if (!Censura.getCachedConfig().isNotifyDetections()) return;
+        if (!Censura.getCachedConfig().shouldNotifyDetections()) return;
 
         for (Player player : staffNotify) {
             player.sendMessage(message);

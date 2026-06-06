@@ -65,8 +65,7 @@ public class CensuraCommand implements TabExecutor {
     }
 
     private void handleToggle(CommandSender sender) {
-        if (!(sender instanceof Player)) return;
-        Player player = (Player) sender;
+        if (!(sender instanceof Player player)) return;
 
         if (!player.hasPermission("censura.toggle")) {
             player.sendMessage(Censura.getCachedConfig().getNoPermission());
@@ -78,7 +77,7 @@ public class CensuraCommand implements TabExecutor {
             return;
         }
 
-        if (Censura.getStaffNotification().contains(player)) {
+        if (Censura.getStaffNotification().isStaffNotified(player)) {
             Censura.getStaffNotification().removeStaff(player);
             player.sendMessage(Censura.getCachedConfig().getNotificationDisabled());
         } else {

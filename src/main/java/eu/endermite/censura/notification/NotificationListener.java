@@ -13,14 +13,14 @@ public class NotificationListener implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    public void handlePlayerJoin(PlayerJoinEvent event) {
         if (event.getPlayer().hasPermission("censura.notify")) {
             staffNotification.addStaff(event.getPlayer());
         }
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void handlePlayerQuit(PlayerQuitEvent event) {
         staffNotification.removeStaff(event.getPlayer());
     }
 }

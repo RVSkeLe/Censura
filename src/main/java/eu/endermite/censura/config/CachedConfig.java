@@ -215,7 +215,7 @@ public class CachedConfig {
         return logDetections;
     }
 
-    public boolean isNotifyDetections() {
+    public boolean shouldNotifyDetections() {
         return notifyDetections;
     }
 

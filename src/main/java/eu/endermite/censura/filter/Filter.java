@@ -35,19 +35,16 @@ public class Filter {
 
     public static boolean detect(String message, CachedConfig.FilterCategory filter, String suspectName, CheckType checkType) {
         MatchType match = detectMatch(message, filter);
-        if (match == null) {
-            return false;
-        }
-        CachedConfig cachedConfig = Censura.getCachedConfig();
+        if (match == null) return false;
 
         String notificationMessage = null;
-        if (cachedConfig.isLogDetections() || cachedConfig.isNotifyDetections())
+        if (Censura.getCachedConfig().isLogDetections() || Censura.getCachedConfig().shouldNotifyDetections())
             notificationMessage = createMessageToLog(match, message, suspectName, checkType);
 
-        if (cachedConfig.isLogDetections())
+        if (Censura.getCachedConfig().isLogDetections())
             Censura.getPlugin().getLogger().info(ChatColor.stripColor(notificationMessage));
 
-        if (cachedConfig.isNotifyDetections())
+        if (Censura.getCachedConfig().shouldNotifyDetections())
             Censura.getStaffNotification().sendNotification(notificationMessage);
 
         return true;
@@ -65,15 +62,6 @@ public class Filter {
         }
 
         return null;
-    }
-
-    public static String createMessageToLog(MatchType match, String message, String suspectName, CheckType checkType) {
-        return String.format("§c%s §7wrote §4\"%s\" §7containing: §4\"%s\" §7in: §c%s",
-                suspectName,
-                message,
-                match.getSnippet(),
-                checkType.toString()
-        );
     }
 
     public static boolean filter(String message, Player player, CheckType checkType) {
@@ -116,5 +104,14 @@ public class Filter {
         if (player == null) return false;
         if (player.isOp() && Censura.getCachedConfig().getOpBypass()) return true;
         return player.hasPermission("censura.bypass");
+    }
+
+    public static String createMessageToLog(MatchType match, String message, String suspectName, CheckType checkType) {
+        return String.format("§c%s §7wrote §4\"%s\" §7containing: §4\"%s\" §7in: §c%s",
+                suspectName,
+                message,
+                match.getSnippet(),
+                checkType.toString()
+        );
     }
 }

@@ -77,11 +77,7 @@ public class Filter {
     }
 
     public static boolean filter(String message, Player player, CheckType checkType) {
-        if (player.isOp() && Censura.getCachedConfig().getOpBypass())
-            return false;
-
-        if (player.hasPermission("censura.bypass"))
-            return false;
+        if (isExempt(player)) return false;
 
         for (CachedConfig.FilterCategory filter : Censura.getCachedConfig().getCategories()) {
             if (detect(message, filter, player.getName(), checkType)) {
@@ -114,5 +110,11 @@ public class Filter {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
             }
         }
+    }
+
+    public static boolean isExempt(Player player) {
+        if (player == null) return false;
+        if (player.isOp() && Censura.getCachedConfig().getOpBypass()) return true;
+        return player.hasPermission("censura.bypass");
     }
 }
